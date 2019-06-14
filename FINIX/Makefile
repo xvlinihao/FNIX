@@ -9,7 +9,7 @@ ifeq ($(shell uname -s),Darwin)
 	AR = x86_64-pc-elf-ar
 endif
 
-OS_NAME    = willOS
+OS_NAME    = FINIX
 BUILD_DIR  = build
 LINKER     = linker.ld
 ISO_DIR    = $(BUILD_DIR)/isofiles
@@ -55,7 +55,7 @@ $(ISO): $(KERNEL)
 	grub-mkrescue -o $@ $(ISO_DIR)
 
 run: $(ISO)
-	qemu-system-x86_64 -m 1G -drive file=disk.img,if=ide,bus=0,unit=0,media=disk,format=raw -cdrom $< -boot d
+	qemu-system-x86_64 -m 4G -drive file=disk.img,if=ide,bus=0,unit=0,media=disk,format=raw -cdrom $< -boot d
 .PHONY: run
 
 run-i386: $(ISO)

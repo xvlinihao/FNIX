@@ -7,5 +7,6 @@ int scheduler_init(void);
 int fork(void);
 int kill(void);
 int sample_task(void);
-
+int ps(void);
+int job(void);
 #endif

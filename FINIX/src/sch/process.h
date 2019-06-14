@@ -14,7 +14,7 @@ typedef struct pcb
 typedef struct process_node
 {
 	pcb_t pcb;
-	struct process_node *next;
-	struct process_node *pre;
+	struct process_node *next;//指向子进程
+	struct process_node *pre;//指向父进程
 } process_node_t;
 #endif

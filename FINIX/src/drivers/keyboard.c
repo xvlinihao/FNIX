@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "sch/scheduler.h"
 
+#include <kernel/kmain.h>
+
 #define SCANCODE_MAX 57
 
 
@@ -13,7 +15,7 @@ char scancode_to_ascii(uint8_t scancode);
 
 
 keyboard_buffer_t kb_buffer;
-
+extern mode_t mode;
 
 static void buffer_clear(void)
 {
@@ -25,7 +27,7 @@ static void buffer_clear(void)
 static void buffer_add(char c)
 {
 	if(kb_buffer.pointer < BUFFER_MAX-1)
-		kb_buffer.buffer[kb_buffer.pointer++] = 'c';
+		kb_buffer.buffer[kb_buffer.pointer++] = c;
 }
 
 static void buffer_show(void)
@@ -42,16 +44,18 @@ static void keyboard_callback(stack_t *stack)
     if (scancode > SCANCODE_MAX) {
         return;
     }
-    if(scancode == 0x1c)
+    if(scancode == 0x1c)//enter
     {
+    	printf("\n");
+    	get_commands((void *)&kb_buffer);
     	buffer_clear();
-    	printf("\n$:");
+    	printf("$:");
     }
-    else if(scancode == 0x1d)
-    {
-	fork();
-	sample_task();
-    }
+    else if(scancode == 0x1)
+    	mode = USER_MODE;
+    else if(scancode == 0x1d)//ctrl
+    	fork();
+    
     else
     {
     	char c = scancode_to_ascii(scancode);
@@ -216,6 +220,10 @@ char scancode_to_ascii(uint8_t scancode)
 
 		case 0x32:
 		c = 'm';
+		break;
+
+		case 0x39:
+		c = ' ';
 		break;
 
 		default:

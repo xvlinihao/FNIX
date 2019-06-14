@@ -15,7 +15,7 @@ void mmap_init(multiboot_tag_mmap_t *mmap, reserved_areas_t reserved) {
     multiboot_start = reserved.multiboot_start;
     multiboot_end = reserved.multiboot_end;
     next_free_frame = 0;
-
+    /*
     CR0_t cr0;
     uint64_t cr3;
     CR4_t cr4;
@@ -27,8 +27,8 @@ void mmap_init(multiboot_tag_mmap_t *mmap, reserved_areas_t reserved) {
     printf("- CR3:0x%x\n",cr3);
     printf("- CR4.PAE:%x\n",cr4.PAE);
     printf("- CR4.PCIDE:%x\n",cr4.PCIDE);
-
-
+    */
+    /*
     multiboot_mmap_entry_t *entry;
     for (
         entry = ((multiboot_tag_mmap_t *) memory_area)->entries;
@@ -42,7 +42,7 @@ void mmap_init(multiboot_tag_mmap_t *mmap, reserved_areas_t reserved) {
         uint32_t reserved = entry->zero;
         printf("- base_addr:0x%x,length:0x%x,type:%x\n",base_addr,length,type);
     }
-
+    */
 
     DEBUG(
         "Initialized MMAP with memory_area = 0x%x, multiboot_start = 0x%x, "
@@ -71,13 +71,15 @@ physical_address_t mmap_read(frame_t request, uint8_t mode)
         entry = (multiboot_mmap_entry_t *) ((unsigned long) entry + ((multiboot_tag_mmap_t *) memory_area)->entry_size)
         )   
         {
-            if(entry->type == MULTIBOOT_MEMORY_AVAILABLE)
+            if(entry->type == MULTIBOOT_MEMORY_AVAILABLE && entry->len>0x40000000)
             {
                 physical_address_t i;
                 physical_address_t base_addr = ((entry->addr/PAGE_SIZE)+1)*PAGE_SIZE;
                 physical_address_t entry_end = base_addr + entry->len;
-
-                for (i = base_addr; i + PAGE_SIZE < entry_end; i += PAGE_SIZE)
+                int bigger_addr = base_addr;
+                if(bigger_addr < multiboot_end)
+                    bigger_addr = multiboot_end;
+                for (i = ((bigger_addr/PAGE_SIZE)+1)*PAGE_SIZE; i + PAGE_SIZE < entry_end; i += PAGE_SIZE)
                 {
                     if (mode == MMAP_GET_NUM && request >= i && request < i + PAGE_SIZE) 
                     {
